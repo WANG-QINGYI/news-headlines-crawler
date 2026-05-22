@@ -7,6 +7,7 @@
 # ================= 自动安装依赖包 =================
 import subprocess
 import sys
+import os
 
 def install_required_packages():
     """自动安装所需的 Python 包"""
@@ -53,9 +54,10 @@ search_suffix = "economy OR exchange rate OR central bank OR GDP OR inflation OR
 start_date = datetime.date(2010, 1, 1)
 end_date = datetime.date(2025, 12, 31)
 
-# 4. 输出文件路径 (改为你的实际路径)
-output_file = r"C:\Users\laput\Desktop\News_Headlines_Control_Group.xlsx"
-backup_file = r"C:\Users\laput\Desktop\News_Headlines_Control_Group_Backup.xlsx"
+# 4. 输出文件路径 (使用相对路径，与脚本同目录)
+script_dir = os.path.dirname(os.path.abspath(__file__))
+output_file = os.path.join(script_dir, "News_Headlines_Control_Group.xlsx")
+backup_file = os.path.join(script_dir, "News_Headlines_Control_Group_Backup.xlsx")
 
 # 5. 爬虫参数配置
 REQUEST_TIMEOUT = 15  # 请求超时时间(秒)
@@ -290,7 +292,7 @@ try:
         # 每个国家处理完成后的进度提示
         print(f"\n  ✅ {country} 的 {month_in_country} 个月份已全部处理完成")
         
-        # 国家间的额外休眠 (防止频繁切换国家导致被检测)
+        # ���家间的额外休眠 (防止频繁切换国家导致被检测)
         if country_idx < len(countries):
             print(f"  ⏱️  国家间休息中... (15 秒)")
             adaptive_sleep(base_time=15)
