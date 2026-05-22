@@ -15,13 +15,15 @@ def install_required_packages():
         'pandas',
         'requests',
         'python-dateutil',
-        'openpyxl'
+        'openpyxl',
+        'urllib3==1.26.15'  # 指定兼容的版本
     ]
     
     print("📦 检查并安装依赖包...\n")
     for package in required_packages:
         try:
-            __import__(package.replace('-', '_'))
+            package_name = package.split('==')[0].replace('-', '_')
+            __import__(package_name)
             print(f"  ✅ {package} 已安装")
         except ImportError:
             print(f"  ⬇️  正在安装 {package}...")
@@ -77,10 +79,11 @@ def setup_session_with_retries():
     session = requests.Session()
     
     # 配置重试策略：HTTP 连接和 HTTPS 连接都启用
+    # 使用 allowed_methods 替代 method_whitelist（兼容新版 urllib3）
     retry_strategy = Retry(
         total=MAX_RETRIES,
         status_forcelist=[429, 500, 502, 503, 504],  # 这些状态码会触发重试
-        method_whitelist=["GET"],  # 只重试 GET 请求
+        allowed_methods=["GET"],  # 只重试 GET 请求
         backoff_factor=1  # 重试间隔: 1s, 2s, 4s...
     )
     
@@ -292,7 +295,7 @@ try:
         # 每个国家处理完成后的进度提示
         print(f"\n  ✅ {country} 的 {month_in_country} 个月份已全部处理完成")
         
-        # ���家间的额外休眠 (防止频繁切换国家导致被检测)
+        # 国家间的额外休眠 (防止频繁切换国家导致被检测)
         if country_idx < len(countries):
             print(f"  ⏱️  国家间休息中... (15 秒)")
             adaptive_sleep(base_time=15)
