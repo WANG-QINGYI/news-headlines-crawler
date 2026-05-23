@@ -46,8 +46,8 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 # ================= 爬虫配置区域 =================
-# 1. 目标国家列表 (仅保留前4个国家进行测试)
-countries = ["Peru", "Poland", "Czech Republic", "Thailand"]
+# 1. 目标国家列表 (仅剩下的3个国家：Malaysia、Uruguay、Norway)
+countries = ["Malaysia", "Uruguay", "Norway"]
 
 # 2. 搜索关键词的后缀 (英文搜索，国际化视野)
 search_suffix = "economy OR exchange rate OR central bank OR GDP OR inflation OR monetary policy"
@@ -58,8 +58,8 @@ end_date = datetime.date(2025, 12, 31)
 
 # 4. 输出文件路径 (使用相对路径，与脚本同目录)
 script_dir = os.path.dirname(os.path.abspath(__file__))
-output_file = os.path.join(script_dir, "News_Headlines_Control_Group.xlsx")
-backup_file = os.path.join(script_dir, "News_Headlines_Control_Group_Backup.xlsx")
+output_file = os.path.join(script_dir, "News_Headlines_Remaining_Countries.xlsx")
+backup_file = os.path.join(script_dir, "News_Headlines_Remaining_Countries_Backup.xlsx")
 
 # 5. 爬虫参数配置
 REQUEST_TIMEOUT = 15  # 请求超时时间(秒)
@@ -211,7 +211,7 @@ total_months = 0
 processed_months = 0
 
 print("=" * 70)
-print("🚀 新闻头条爬虫 - 控制组版本（测试模式：仅4个国家）")
+print("🚀 新闻头条爬虫 - 剩余国家版本（Malaysia、Uruguay、Norway）")
 print("=" * 70)
 print(f"📍 目标国家: {', '.join(countries)}")
 print(f"📅 时间范围: {start_date.strftime('%Y-%m')} 至 {end_date.strftime('%Y-%m')}")
