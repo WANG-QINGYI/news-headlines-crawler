@@ -46,8 +46,8 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 # ================= 爬虫配置区域 =================
-# 1. 目标国家列表
-countries = ["Peru", "Poland", "Czech Republic", "Thailand", "Malaysia", "Uruguay", "Norway"]
+# 1. 目标国家列表 (仅保留前4个国家进行测试)
+countries = ["Peru", "Poland", "Czech Republic", "Thailand"]
 
 # 2. 搜索关键词的后缀 (英文搜索，国际化视野)
 search_suffix = "economy OR exchange rate OR central bank OR GDP OR inflation OR monetary policy"
@@ -211,7 +211,7 @@ total_months = 0
 processed_months = 0
 
 print("=" * 70)
-print("🚀 新闻头条爬虫 - 控制组版本")
+print("🚀 新闻头条爬虫 - 控制组版本（测试模式：仅4个国家）")
 print("=" * 70)
 print(f"📍 目标国家: {', '.join(countries)}")
 print(f"📅 时间范围: {start_date.strftime('%Y-%m')} 至 {end_date.strftime('%Y-%m')}")
