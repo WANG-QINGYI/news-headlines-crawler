@@ -222,7 +222,7 @@ jobs:
           
           python process_data.py
       
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: google-trends-results
