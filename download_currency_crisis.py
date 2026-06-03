@@ -1,0 +1,74 @@
+import pandas as pd
+from pytrends.request import TrendReq
+import time
+from datetime import datetime
+
+GEO_CODES = {
+    "Argentina": "AR", "Turkey": "TR", "Russia": "RU", "Brazil": "BR",
+    "South Africa": "ZA", "India": "IN", "Indonesia": "ID", "Kazakhstan": "KZ",
+    "Ukraine": "UA", "Egypt": "EG", "Hungary": "HU", "Mexico": "MX",
+    "Colombia": "CO", "United Kingdom": "GB", "Chile": "CL", "Switzerland": "CH",
+    "Japan": "JP", "Singapore": "SG", "South Korea": "KR", "Sweden": "SE",
+    "Canada": "CA", "Australia": "AU", "New Zealand": "NZ", "Norway": "NO",
+    "Peru": "PE", "Poland": "PL", "Czech Republic": "CZ", "Thailand": "TH",
+    "Malaysia": "MY", "Uruguay": "UY"
+}
+
+pytrend = TrendReq(hl="en-US", tz=0, retries=5, backoff_factor=0.5, timeout=(10, 35))
+all_data = []
+
+for country in GEO_CODES.keys():
+    geo = GEO_CODES[country]
+    print(f"Downloading {country}...")
+    
+    for year in range(2010, 2026):
+        timeframe = f"{year}-01-01 {year}-12-31"
+        
+        for attempt in range(3):
+            try:
+                pytrend.build_payload(kw_list=["currency crisis"], geo=geo, timeframe=timeframe)
+                df = pytrend.interest_over_time()
+                
+                if df.empty:
+                    break
+                
+                if "isPartial" in df.columns:
+                    df = df.drop(columns=["isPartial"])
+                
+                # 提取Week4（22-28日）
+                df['day'] = df.index.day
+                df['year_month'] = df.index.to_period('M')
+                week4_mask = (df['day'] >= 22) & (df['day'] <= 28)
+                df_week4 = df[week4_mask]
+                
+                if df_week4.empty:
+                    break
+                
+                df_week4 = df_week4.drop_duplicates(subset=['year_month'], keep='first')
+                df_week4 = df_week4.reset_index()
+                df_week4.rename(columns={"date": "Time_ID"}, inplace=True)
+                df_week4["Country_ID"] = country
+                df_week4 = df_week4[["Country_ID", "Time_ID", "currency crisis"]]
+                
+                all_data.append(df_week4)
+                time.sleep(2)
+                break
+            
+            except Exception as e:
+                if attempt == 2:
+                    print(f"  Failed: {country} {year}")
+                else:
+                    time.sleep(10)
+
+final_df = pd.concat(all_data, ignore_index=True)
+final_df["Time_ID"] = pd.to_datetime(final_df["Time_ID"]).dt.strftime("%Y-%m-%d")
+final_df = final_df.sort_values(["Country_ID", "Time_ID"]).reset_index(drop=True)
+
+# 导出Excel
+output_file = f'currency_crisis_week4_2010_2025.xlsx'
+final_df.to_excel(output_file, index=False)
+
+print(f"\n✓ Done!")
+print(f"  File: {output_file}")
+print(f"  Rows: {len(final_df)}")
+print(f"  Countries: {final_df['Country_ID'].nunique()}")
